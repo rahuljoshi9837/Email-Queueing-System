@@ -63,7 +63,7 @@ Create a `.env` file in the root directory with the following content:
 PORT=5000
 RABBITMQ_URL=amqp://rabbitmq
 EMAIL_QUEUE=email_queue
-SMTP_USER=your@gmail.com
+SMTP_USER=your@email.com
 SMTP_PASS=your_app_password
 ```
 
@@ -81,6 +81,56 @@ This command will:
 - Start RabbitMQ (with management UI on port `15672`)
 - Launch the **Producer** service on port `5000`
 - Launch the **Consumer** worker service
+
+---
+
+## 🐳 Sample docker-compose.yml
+
+```yaml
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    container_name: producer
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=5000
+      - RABBITMQ_URL=amqp://rabbitmq
+      - EMAIL_QUEUE=email_queue
+      - SMTP_USER=your@email.com
+      - SMTP_PASS=your_app_password
+    ports:
+      - "5000:5000"
+
+  consumer:
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    container_name: consumer
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+      - EMAIL_QUEUE=email_queue
+      - SMTP_USER=your@email.com
+      - SMTP_PASS=your_app_password
+```
+
+> 📝 Be sure to replace `SMTP_USER` and `SMTP_PASS` with your real email and app password in your `.env` file or environment section.
 
 ---
 
