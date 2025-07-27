@@ -8,7 +8,7 @@ npm-debug.log
 
 # Docker
 *.local
-docker-compose.override.yml
+docker-compose.yml
 
 # OS & Editor
 .DS_Store
