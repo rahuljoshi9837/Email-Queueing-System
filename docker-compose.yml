@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # RabbitMQ broker
+      - "15672:15672"   # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    container_name: producer
+    depends_on:
+      - rabbitmq
+    environment:
+      - PORT=5000
+      - RABBITMQ_URL=amqp://rabbitmq
+      - EMAIL_QUEUE=email_queue
+      - SMTP_USER=rahuljoshi9837@gmail.com
+      - SMTP_PASS=lkdx evzj hehm mxic
+    ports:
+      - "5000:5000"
+
+  consumer:
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    container_name: consumer
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+      - EMAIL_QUEUE=email_queue
+      - SMTP_USER=rahuljoshi9837@gmail.com
+      - SMTP_PASS=lkdx evzj hehm mxic
